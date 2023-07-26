@@ -13,6 +13,9 @@
             margin: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
         }
     </style>
 </svelte:head>
@@ -27,7 +30,9 @@
                 <span class='centered'>Thread does not exist</span>
             {:else}
                 <div class="layout">
-                    {data.id}
+                    <span class=centered>
+                        {JSON.stringify(threadData.data)}
+                    </span>
                 </div>
             {/if}
         {/await}

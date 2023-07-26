@@ -6,6 +6,13 @@ export type User = {
     uid: string,
 }
 
+export type ThreadUser = {
+    username: string,
+    uid: string,
+    pfp: string,
+    reputation: number,
+}
+
 export type Profile = {
     username: string,
     alias: string,
@@ -21,7 +28,7 @@ export type Comment = {
 }
 
 export type Thread = {
-    author: User,
+    author: ThreadUser,
     title: string,
     content: string,
     likes: number,
@@ -85,7 +92,9 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
     let threadData: Thread = {
         author: {
             uid: '',
-            username: ''
+            username: '',
+            pfp: '',
+            reputation: 0
         },
         comments: [],
         content: '',
@@ -106,23 +115,23 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             
             if (replyCard.length > 0) {
                 if (index == 0) {
-                    const content = replyCard.find('> .thread_replycontent').text().trim()
-                    
+                    const userStats = replyCard.find('.userstats')
+
                     threadData.author.username = replierData.find('.username').text().trim()
                     threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
-                    threadData.content = content
+                    threadData.content = replyCard.find('> .thread_replycontent').text().trim()
                     threadData.title = loaded('#topic').text().trim()
                     threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
+                    threadData.author.reputation = parseInt(userStats.find('bad').text().trim()) || parseInt(userStats.find('good').text().trim())
                 } else {
                     const username = replierData.find('.username').text().trim()
-                    const content = replyCard.find('> .thread_replycontent').text().trim()
-                    
+
                     const parsedComment: Comment = {
                         author: {
                             uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
                             username
                         },
-                        content
+                        content: replyCard.find('> .thread_replycontent').text().trim()
                     }
                     
                     threadData.comments.push(parsedComment)
