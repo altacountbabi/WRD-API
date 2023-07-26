@@ -65,7 +65,7 @@ export const getOnlineUsers = async (): Promise<User[]> => {
 export const getLatestThreads = async (): Promise<DisplayThread[]> => {
     let latestThreads: DisplayThread[] = []
 
-    const url = 'https://forum.wearedevs.net/c/all?order=latestthread'
+    const url = 'https://forum.wearedevs.net/c/all'
     const rawHtml = (await axios.get(url)).data
     const loaded = cheerio.load(rawHtml)
 
@@ -79,7 +79,7 @@ export const getLatestThreads = async (): Promise<DisplayThread[]> => {
         const lastReplier = columns.find('a[href^="/profile"]')
 
         const lastReplierUser: User = {
-            username: lastReplier.text().trim(),
+            username: lastReplier.html() as string,
             uid: lastReplier.attr('href')?.replace('/profile?uid=', '') as string
         }
 
