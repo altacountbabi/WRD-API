@@ -118,9 +118,9 @@
     }
 
     .thread_title {
-        width: 1000px;
+        width: 1020px;
         height: auto;
-        margin-top: 10px;
+        margin-top: 35px;
         background: rgba(255, 255, 255, 0.01);
         border: 2px solid rgba(255, 255, 255, 0.1);
         border-radius: 10px;
