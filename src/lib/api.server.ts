@@ -11,6 +11,7 @@ export type ThreadUser = {
     uid: string,
     pfp: string,
     reputation: number,
+    alias: string,
 }
 
 export type Profile = {
@@ -94,6 +95,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             uid: '',
             username: '',
             pfp: '',
+            alias: '',
             reputation: 0
         },
         comments: [],
@@ -117,7 +119,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                 const userStats = loaded('.userstats')
 
                 if (index == 0) {
-
+                    threadData.author.alias = replierData.find('.userdesc > .usertitle').text().trim() || ''
                     threadData.author.username = replierData.find('.username').text().trim()
                     threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
                     threadData.content = replyCard.find('> .thread_replycontent').text().trim()
@@ -134,6 +136,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                         author: {
                             uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
                             username,
+                            alias: replierData.find('.userdesc > .usertitle').text().trim() || '',
                             reputation: parseInt(userStats.eq(index).find('p:has(span) span').text().trim()),
                             pfp
                         },
