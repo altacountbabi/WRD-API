@@ -1,7 +1,6 @@
 <script lang='ts'>
-	import Background from "$lib/components/Background.svelte"
+	import Background from '$lib/components/Background.svelte'
     import axios from 'axios'
-	import { onMount } from "svelte"
 </script>
 
 <svelte:head>
@@ -20,32 +19,32 @@
 
 <Background/>
 <main>
-    <div class="onlineUsers">
+    <div class='onlineUsers'>
         <span>Online Users:</span>
         <div>
             {#await axios.get('/api/onlineUsers')}
                 <span>Loading..</span>
             {:then onlineUsers}
                 {#each onlineUsers.data as onlineUser}
-                    <a href="/user/{onlineUser.uid}">{onlineUser.username}</a>
+                    <a href='/user/{onlineUser.uid}'>{onlineUser.username}</a>
                 {/each}
             {/await}
         </div>
     </div>
-    <div class="latestThreads">
+    <div class='latestThreads'>
         <span>Latest Threads:</span>
         <div>
             {#await axios.get('/api/latestThreads')}
                 <span>Loading..</span>
             {:then latestThreads}
-                <div class="threads">
+                <div class='threads'>
                     {#each latestThreads.data as thread}
-                        <div class="thread">
-                            <a href="https://forum.wearedevs.net/t/{thread.id}" class="thread_title">{thread.title}</a>
-                            <div class="thread_info">
+                        <div class='thread'>
+                            <a href='https://forum.wearedevs.net/t/{thread.id}' class='thread_title'>{thread.title}</a>
+                            <div class='thread_info'>
                                 <span>Replies: {thread.replies}</span>
                                 <span>Views: {thread.views}</span>
-                                <a href="user/{thread.lastReplier.uid}">Last replier: {thread.lastReplier.username}</a>
+                                <a href='user/{thread.lastReplier.uid}'>Last replier: {thread.lastReplier.username}</a>
                             </div>
                         </div>
                     {/each}

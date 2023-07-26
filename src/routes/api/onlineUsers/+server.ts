@@ -1,8 +1,8 @@
 import { json } from "@sveltejs/kit"
-import * as api from '$lib/api'
+import * as api from "$lib/api.server"
 
 export async function GET() {
-    const result = await api.getOnlineUsers()
+	const result = await api.getOnlineUsers()
 
-    return json(result)
+	return json(result)
 }
