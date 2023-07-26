@@ -23,7 +23,7 @@ export type Profile = {
 }
 
 export type Comment = {
-    author: User,
+    author: ThreadUser,
     content: string
 }
 
@@ -112,28 +112,34 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             const replyGroup = loaded(element)
             const replierData = replyGroup.find('.thread_replierdata')
             const replyCard = replyGroup.find('> .replycard:not(:has(> div.comment))')
-            
+
             if (replyCard.length > 0) {
+                const userStats = loaded('.userstats')
+
                 if (index == 0) {
-                    const userStats = replyCard.find('.userstats')
 
                     threadData.author.username = replierData.find('.username').text().trim()
                     threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
                     threadData.content = replyCard.find('> .thread_replycontent').text().trim()
                     threadData.title = loaded('#topic').text().trim()
                     threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
-                    threadData.author.reputation = parseInt(userStats.find('bad').text().trim()) || parseInt(userStats.find('good').text().trim())
+                    threadData.author.reputation = parseInt(userStats.eq(index).find('p:has(span) span').text().trim())
                 } else {
                     const username = replierData.find('.username').text().trim()
+                    let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+
+                    if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
 
                     const parsedComment: Comment = {
                         author: {
                             uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
-                            username
+                            username,
+                            reputation: parseInt(userStats.eq(index).find('p:has(span) span').text().trim()),
+                            pfp
                         },
                         content: replyCard.find('> .thread_replycontent').text().trim()
                     }
-                    
+
                     threadData.comments.push(parsedComment)
                 }
             }
