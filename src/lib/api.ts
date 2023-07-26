@@ -95,7 +95,6 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
 
     const url = `https://forum.wearedevs.net/t/${id}`
     try {
-
         const rawHtml = (await axios.get(url)).data
         const loaded = cheerio.load(rawHtml)
         const replyGroups = loaded('.replygroup')

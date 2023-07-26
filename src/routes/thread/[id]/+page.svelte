@@ -24,7 +24,7 @@
             <span class='centered'>Loading..</span>
         {:then threadData}
             {#if threadData.data == 'Thread does not exist'}
-                <span class='centered'>{threadData.data}</span>
+                <span class='centered'>Thread does not exist</span>
             {:else}
                 <div class="layout">
                     {data.id}
