@@ -76,6 +76,9 @@
                         </div>
                     </div>
                 {/each}
+                {#each [0,1,2,3] as _}
+                    <br>
+                {/each}
             {/if}
         {/await}
     </div>
