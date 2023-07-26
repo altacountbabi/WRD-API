@@ -119,6 +119,11 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                 const userStats = loaded('.userstats')
 
                 if (index == 0) {
+                    let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+
+                    if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+
+                    threadData.author.pfp = pfp
                     threadData.author.alias = replierData.find('.userdesc > .usertitle').text().trim() || ''
                     threadData.author.username = replierData.find('.username').text().trim()
                     threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string

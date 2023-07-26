@@ -40,7 +40,7 @@
                 <div class='threads'>
                     {#each latestThreads.data as thread}
                         <div class='thread'>
-                            <a href='https://forum.wearedevs.net/t/{thread.id}' class='thread_title'>{thread.title}</a>
+                            <a href='/thread/{thread.id}' class='thread_title'>{thread.title}</a>
                             <div class='thread_info'>
                                 <span>Replies: {thread.replies}</span>
                                 <span>Views: {thread.views}</span>
