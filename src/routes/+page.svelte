@@ -2,12 +2,6 @@
 	import Background from "$lib/components/Background.svelte"
     import axios from 'axios'
 	import { onMount } from "svelte"
-
-    let latestData = {}
-
-    onMount(async () => {
-        latestData = (await axios.get('/api/latestData')).data
-    })
 </script>
 
 <svelte:head>

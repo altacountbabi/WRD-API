@@ -36,11 +36,6 @@ export type DisplayThread = {
     id: string
 }
 
-type LatestData = {
-    onlineUsers: User[],
-    latestThreads: DisplayThread[]
-}
-
 export const getOnlineUsers = async (): Promise<User[]> => {
     let onlineUsers: User[] = []
   
@@ -84,13 +79,6 @@ export const getLatestThreads = async (): Promise<DisplayThread[]> => {
     })
 
     return latestThreads
-}
-
-export const getLatestData = async (): Promise<LatestData> => {
-    return {
-        onlineUsers: await getOnlineUsers(),
-        latestThreads: await getLatestThreads()
-    }
 }
 
 export const fetchThreadData = async (id: string): Promise<Thread> => {
