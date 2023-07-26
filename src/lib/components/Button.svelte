@@ -1,9 +1,12 @@
 <script lang='ts'>
     export let icon: string
+    export let callback: () => void
 </script>
 
 <link href='https://fonts.googleapis.com/icon?family=Material+Icons+Round' rel='stylesheet'>
-<div class='btn'>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class='btn' on:click={callback}>
     <span class="material-icons-round">{icon}</span>
 </div>
 

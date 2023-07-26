@@ -33,7 +33,7 @@
                 <span class='centered'>Thread does not exist</span>
             {:else}
                 <div class="thread_title">
-                    <Button icon='arrow_back_ios'/>
+                    <Button icon='arrow_back_ios' callback={() => window.location.href = '/'}/>
                     <span>{threadData.data.title}</span>
                 </div>
                 <div class="card">
@@ -127,6 +127,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+        gap: 7px;
     }
 
     .thread_title > span {
