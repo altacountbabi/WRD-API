@@ -2,7 +2,6 @@
 
 1. A brain
 2. Node.js and npm
-3. Code editor (optional)
 
 # How to use:
 
