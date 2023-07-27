@@ -42,8 +42,9 @@
                         <div class='thread'>
                             <a href='/thread/{thread.id}' class='thread_title'>{thread.title}</a>
                             <div class='thread_info'>
-                                <span>Replies: {thread.replies}</span>
-                                <span>Views: {thread.views}</span>
+                                <a href="/user/{thread.author.uid}">By {thread.author.username}</a> | 
+                                <span>Replies: {thread.replies}</span> | 
+                                <span>Views: {thread.views}</span> | 
                                 <a href='user/{thread.lastReplier.uid}'>Last replier: {thread.lastReplier.username}</a>
                             </div>
                         </div>
