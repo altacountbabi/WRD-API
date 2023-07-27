@@ -1,14 +1,13 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
-const jsdom = require('jsdom')
-const { JSDOM } = jsdom
+import { JSDOM } from 'jsdom';
 
-export type User = {
+type User = {
     username: string,
     uid: string,
 }
 
-export type ThreadUser = {
+type ThreadUser = {
     username: string,
     uid: string,
     pfp: string,
@@ -16,7 +15,7 @@ export type ThreadUser = {
     alias: string,
 }
 
-export type Profile = {
+type Profile = {
     username: string,
     alias: string,
     pfp: string,
@@ -25,12 +24,12 @@ export type Profile = {
     bio: string
 }
 
-export type Comment = {
+type Comment = {
     author: ThreadUser,
     content: string
 }
 
-export type Thread = {
+type Thread = {
     author: ThreadUser,
     title: string,
     content: string,
@@ -38,7 +37,7 @@ export type Thread = {
     comments: Comment[]
 }
 
-export type DisplayThread = {
+type DisplayThread = {
     title: string,
     replies: number,
     views: number,
@@ -58,7 +57,7 @@ export const getOnlineUsers = async (): Promise<User[]> => {
     })
 
     const onlineList = dom.window.document.querySelector('.onlineList > div > p') 
-    onlineList.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
+    onlineList?.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
         const username = a.textContent?.trim() as string
         const uid = a.getAttribute('href')?.replace('/profile?uid=', '') as string
 
