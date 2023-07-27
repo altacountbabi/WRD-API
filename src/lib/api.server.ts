@@ -116,9 +116,8 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             const replyCard = replyGroup.find('> .replycard:not(:has(> div.comment))')
 
             if (replyCard.length > 0) {
-                const userStats = loaded('.userstats')
-
                 if (index == 0) {
+                    const userStats = loaded('.userstats')
                     let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
 
                     if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
@@ -132,6 +131,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                     threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
                     threadData.author.reputation = parseInt(userStats.eq(index).find('p:has(span) span').text().trim())
                 } else {
+                    const userStats = loaded('.userstats')
                     const username = replierData.find('.username').text().trim()
                     let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
 
@@ -142,7 +142,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                             uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
                             username,
                             alias: replierData.find('.userdesc > .usertitle').text().trim() || '',
-                            reputation: parseInt(userStats.eq(index).find('p:has(span) span').text().trim()),
+                            reputation: parseInt(userStats.find('p:has(span) span').html() as string),
                             pfp
                         },
                         content: replyCard.find('> .thread_replycontent').text().trim()
