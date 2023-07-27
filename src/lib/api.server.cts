@@ -1,5 +1,7 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
+const jsdom = require('jsdom')
+const { JSDOM } = jsdom
 
 export type User = {
     username: string,
@@ -46,18 +48,35 @@ export type DisplayThread = {
 
 export const getOnlineUsers = async (): Promise<User[]> => {
     let onlineUsers: User[] = []
-  
-    const url = 'https://forum.wearedevs.net'
-    const rawHtml = (await axios.get(url)).data
-    const loaded = cheerio.load(rawHtml)
-    const onlineList = loaded('.onlineList > div > p')
 
-    onlineList.find('a').each((_, element) => {
-        const username = loaded(element).text().trim()
-        const profileUrl = loaded(element).attr('href')
-  
-        if (username !== '' && profileUrl !== '') onlineUsers.push({ username, uid: profileUrl?.replace('/profile?uid=', '') as string })
+    const dom = new JSDOM(``, {
+        url: 'https://forum.wearedevs.net',
+        referrer: 'https://forum.wearedevs.net',
+        contentType: 'text/html',
+        includeNodeLocations: true,
+        storageQuota: 10000000
     })
+
+    const onlineList = dom.window.document.querySelector('.onlineList > div > p') 
+    onlineList.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
+        const username = a.textContent?.trim() as string
+        const uid = a.getAttribute('href')?.replace('/profile?uid=', '') as string
+
+        if (username !== '' && uid !== '') {
+            onlineUsers.push({
+                username,
+                uid
+            })
+        }
+    })
+
+    
+    // onlineList.find('a').each((_, element) => {
+        // const username = loaded(element).text().trim()
+        // const profileUrl = loaded(element).attr('href')
+//   
+        // if (username !== '' && profileUrl !== '') onlineUsers.push({ username, uid: profileUrl?.replace('/profile?uid=', '') as string })
+    // })
   
     return onlineUsers
 }

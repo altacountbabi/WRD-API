@@ -1,5 +1,5 @@
 import { json, type RequestEvent } from "@sveltejs/kit"
-import * as api from "$lib/api.server"
+import * as api from "$lib/api.server.cjs"
 
 export async function GET({ request }: any) {
 	let id: string = request.url.replace(
