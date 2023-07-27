@@ -7,5 +7,6 @@
 
 1. Clone this repository
 2. Open cloned repository with a terminal
-3. Run the following command: `npm run dev`
-4. Open http://localhost:5173 in your browser
+3. Run this command in the terminal to install required dependencies: `npm i`
+4. Run this command to start the dev server: `npm run dev`
+5. Open http://localhost:5173 in your browser
