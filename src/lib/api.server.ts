@@ -127,7 +127,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
         replycards.forEach((card, idx) => {
             if (idx == 0) {
                 const likes = parseInt(card.querySelector('.btnLikeReply')?.textContent?.trim() as string)
-                const content = sanitizeHtml(card.querySelector('.thread_replycontent')?.innerHTML as string)
+                const content = card.querySelector('.thread_replycontent')?.innerHTML as string
                 const replierData = card.querySelector('.thread_replierdata')
 
                 threadData.content = content
