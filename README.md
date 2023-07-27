@@ -13,5 +13,5 @@
 
 # Known Issues:
 
-1. This will only work on localhost:5173 for now, this is because I was too lazy to get api params to work on some of the api end points and they just replace localhost:5173 with nothing to get the params
+1. This will only work on localhost:5173 for now, the folders that cause this issue are: /src/lib/routes/api/profileData and /src/lib/routes/api/threadData
 2. UI is not responsive (not planning to fix this)
