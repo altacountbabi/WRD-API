@@ -42,7 +42,8 @@ type DisplayThread = {
     replies: number,
     views: number,
     lastReplier: User,
-    id: string
+    id: string,
+    author: User
 }
 
 export const getOnlineUsers = async (): Promise<User[]> => {
@@ -63,14 +64,6 @@ export const getOnlineUsers = async (): Promise<User[]> => {
             })
         }
     })
-
-    
-    // onlineList.find('a').each((_, element) => {
-        // const username = loaded(element).text().trim()
-        // const profileUrl = loaded(element).attr('href')
-//   
-        // if (username !== '' && profileUrl !== '') onlineUsers.push({ username, uid: profileUrl?.replace('/profile?uid=', '') as string })
-    // })
   
     return onlineUsers
 }
@@ -78,25 +71,27 @@ export const getOnlineUsers = async (): Promise<User[]> => {
 export const getLatestThreads = async (): Promise<DisplayThread[]> => {
     let latestThreads: DisplayThread[] = []
 
-    const url = 'https://forum.wearedevs.net/c/all'
-    const rawHtml = (await axios.get(url)).data
-    const loaded = cheerio.load(rawHtml)
+    const rawHtml = (await axios.get('https://forum.wearedevs.net/c/all')).data
+    const dom = new JSDOM(rawHtml, { includeNodeLocations: true })
 
-
-    loaded('table.forumcontainer tbody tr').each((_, element) => {
-        const columns = loaded(element).find('td')
-
-        const title = columns.find('a.thread-title').text().trim()
-        const replies = parseInt(columns.eq(1).text().trim(), 10)
-        const views = parseInt(columns.eq(2).text().trim(), 10)
-        const lastReplier = columns.find('a[href^="/profile"]')
-
-        const lastReplierUser: User = {
-            username: lastReplier.html() as string,
-            uid: lastReplier.attr('href')?.replace('/profile?uid=', '') as string
+    const threads = dom.window.document.querySelectorAll('tbody > tr')
+    threads.forEach(thread => {
+        const title = thread.querySelector('td > a')?.textContent?.trim() as string
+        const id = thread.querySelector('td > a')?.getAttribute('href')?.replace('\/t\/', '') as string
+        const replies = parseInt(thread.querySelectorAll('td[class="not-mobile"]')[0].textContent?.trim() as string)
+        const views = parseInt(thread.querySelectorAll('td[class="not-mobile"]')[1].textContent?.trim() as string)
+        const lastReplier: User = {
+            username: thread.querySelectorAll('td[class="not-mobile"]')[2].querySelector('a')?.textContent?.trim() as string,
+            uid: thread.querySelectorAll('td[class="not-mobile"]')[2].querySelector('a')?.getAttribute('href')?.replace('/profile?uid=', '') as string
+        }
+        const author = {
+            username: thread.querySelector('td > p > a')?.textContent?.trim() as string,
+            uid: thread.querySelector('td > p > a')?.getAttribute('href')?.replace('/profile?uid=', '') as string
         }
 
-        latestThreads.push({ title, replies, views, lastReplier: lastReplierUser, id: columns.find('a.thread-title').attr('href')?.replace('\/t\/', '') as string })
+        latestThreads.push({
+            title, replies, views, lastReplier, id, author
+        })
     })
 
     return latestThreads
