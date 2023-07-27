@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
-import { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom'
+import sanitizeHtml from 'sanitize-html'
 
 type User = {
     username: string,
@@ -73,8 +74,9 @@ export const getLatestThreads = async (): Promise<DisplayThread[]> => {
 
     const rawHtml = (await axios.get('https://forum.wearedevs.net/c/all')).data
     const dom = new JSDOM(rawHtml, { includeNodeLocations: true })
+    const document = dom.window.document
 
-    const threads = dom.window.document.querySelectorAll('tbody > tr')
+    const threads = document.querySelectorAll('tbody > tr')
     threads.forEach(thread => {
         const title = thread.querySelector('td > a')?.textContent?.trim() as string
         const id = thread.querySelector('td > a')?.getAttribute('href')?.replace('\/t\/', '') as string
@@ -115,54 +117,78 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
     const url = `https://forum.wearedevs.net/t/${id}`
     try {
         const rawHtml = (await axios.get(url)).data
-        const loaded = cheerio.load(rawHtml)
-        const replyGroups = loaded('.replygroup')
+        const dom = new JSDOM(rawHtml, { includeNodeLocations: true })
+        const document = dom.window.document
+
+        const title = sanitizeHtml(document.querySelector('#topic')?.textContent?.trim() as string)
+        const replycards = document.querySelectorAll('.replygroup')
         
-        replyGroups.each((index, element) => {
-            const replyGroup = loaded(element)
-            const replierData = replyGroup.find('.thread_replierdata')
-            const replyCard = replyGroup.find('> .replycard:not(:has(> div.comment))')
+        threadData.title = title
+        replycards.forEach((card, idx) => {
+            if (idx == 0) {
+                const likes = parseInt(card.querySelector('.btnLikeReply')?.textContent?.trim() as string)
+                const content = sanitizeHtml(card.querySelector('.thread_replycontent')?.innerHTML as string)
+                const replierData = card.querySelector('.thread_replierdata')
 
-            if (replyCard.length > 0) {
-                if (index == 0) {
-                    const userStats = loaded('.userstats')
-                    let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+                threadData.content = content
+                threadData.likes = likes
 
-                    if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+                let pfp = card.querySelector('.thread_pfp')?.getAttribute('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
 
-                    threadData.author.pfp = pfp
-                    threadData.author.alias = replierData.find('.userdesc > .usertitle').text().trim() || ''
-                    threadData.author.username = replierData.find('.username').text().trim()
-                    threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
-                    threadData.content = replyCard.find('> .thread_replycontent').text().trim()
-                    threadData.title = loaded('#topic').text().trim()
-                    threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
-                    threadData.author.reputation = parseInt(userStats.eq(index).find('p:has(span) span').text().trim())
-                } else {
-                    const userStats = loaded('.userstats')
-                    const username = replierData.find('.username').text().trim()
-                    let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
-
-                    if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
-
-                    const parsedComment: Comment = {
-                        author: {
-                            uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
-                            username,
-                            alias: replierData.find('.userdesc > .usertitle').text().trim() || '',
-                            reputation: parseInt(userStats.find('p:has(span) span').html() as string),
-                            pfp
-                        },
-                        content: replyCard.find('> .thread_replycontent').text().trim()
-                    }
-
-                    threadData.comments.push(parsedComment)
-                }
+                if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+                const uid = card.querySelector('a[href^="/profile?uid="]')?.getAttribute('href')?.replace('/profile?uid=', '') as string
+                threadData.author.pfp = pfp
+                threadData.author.uid = uid
             }
         })
+
+        // replyGroups.each((index, element) => {
+            // const replyGroup = loaded(element)
+            // const replierData = replyGroup.find('.thread_replierdata')
+            // const replyCard = replyGroup.find('> .replycard:not(:has(> div.comment))')
+// 
+            // if (replyCard.length > 0) {
+                // if (index == 0) {
+                    // const userStats = loaded('.userstats')
+                    // let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+// 
+                    // if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+// 
+                    // threadData.author.pfp = pfp
+                    // threadData.author.alias = replierData.find('.userdesc > .usertitle').text().trim() || ''
+                    // threadData.author.username = replierData.find('.username').text().trim()
+                    // threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
+                    // threadData.content = replyCard.find('> .thread_replycontent').text().trim()
+                    // threadData.title = loaded('#topic').text().trim()
+                    // threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
+                    // threadData.author.reputation = parseInt(userStats.eq(index).find('p:has(span) span').text().trim())
+                // } else {
+                    // const userStats = loaded('.userstats')
+                    // const username = replierData.find('.username').text().trim()
+                    // let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+// 
+                    // if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+// 
+                    // const parsedComment: Comment = {
+                        // author: {
+                            // uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
+                            // username,
+                            // alias: replierData.find('.userdesc > .usertitle').text().trim() || '',
+                            // reputation: parseInt(userStats.find('p:has(span) span').html() as string),
+                            // pfp
+                        // },
+                        // content: replyCard.find('> .thread_replycontent').text().trim()
+                    // }
+// 
+                    // threadData.comments.push(parsedComment)
+                // }
+            // }
+        // })
         
+        // console.log(threadData)
         return threadData
-    } catch {
+    } catch (ex) {
+        console.log(ex)
         return threadData
     }
 }

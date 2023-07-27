@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="bottom">
-                        {threadData.data.content}
+                        {@html threadData.data.content}
                     </div>
                 </div>
                 {#each threadData.data.comments as comment}
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="bottom">
-                            {comment.content}
+                            {@html comment.content}
                         </div>
                     </div>
                 {/each}
@@ -212,6 +212,15 @@
         display: flex;
         flex-direction: column;
         font-size: 18px;
+    }
+
+    .bottom :global(a) {
+        text-decoration: none;
+        color: #0073d2;
+    }
+
+    .bottom :global(p) {
+        margin: 0;
     }
 
     .CHROME_WEIRD_SHIT_FIX {

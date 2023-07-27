@@ -8,9 +8,11 @@ export async function GET({ request }: any) {
 	)
 	const result = await api.fetchThreadData(id)
 
-	if (result.author.uid == "") {
-		return json("Thread does not exist")
-	}
+	console.log(`\\${result.content}\\`)
+
+	// if (result.author.uid == "") {
+		// return json("Thread does not exist")
+	// }
 
 	return json(result)
 }
