@@ -7,5 +7,11 @@
 
 1. Clone this repository
 2. Open cloned repository with a terminal
-3. Run the following command: `npm run dev`
-4. Open http://localhost:5173 in your browser
+3. Run this command in the terminal to install required dependencies: `npm i`
+4. Run this command to start the dev server: `npm run dev`
+5. Open http://localhost:5173 in your browser
+
+# Known Issues:
+
+1. This will only work on localhost:5173 for now, the folders that cause this issue are: /src/lib/routes/api/profileData and /src/lib/routes/api/threadData
+2. UI is not responsive (not planning to fix this)
