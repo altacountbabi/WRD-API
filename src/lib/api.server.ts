@@ -48,15 +48,10 @@ type DisplayThread = {
 export const getOnlineUsers = async (): Promise<User[]> => {
     let onlineUsers: User[] = []
 
-    const dom = new JSDOM(``, {
-        url: 'https://forum.wearedevs.net',
-        referrer: 'https://forum.wearedevs.net',
-        contentType: 'text/html',
-        includeNodeLocations: true,
-        storageQuota: 10000000
-    })
+    const rawHtml = (await axios.get('https://forum.wearedevs.net')).data
+    const dom = new JSDOM(rawHtml, { includeNodeLocations: true })
 
-    const onlineList = dom.window.document.querySelector('.onlineList > div > p') 
+    const onlineList = dom.window.document.querySelector('.onlineList > div > p')
     onlineList?.querySelectorAll('a').forEach((a: HTMLAnchorElement) => {
         const username = a.textContent?.trim() as string
         const uid = a.getAttribute('href')?.replace('/profile?uid=', '') as string
