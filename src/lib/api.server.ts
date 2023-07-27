@@ -27,7 +27,9 @@ type Profile = {
 
 type Comment = {
     author: ThreadUser,
-    content: string
+    content: string,
+    likes: number,
+    comments?: Comment[]
 }
 
 type Thread = {
@@ -120,7 +122,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
         const dom = new JSDOM(rawHtml, { includeNodeLocations: true })
         const document = dom.window.document
 
-        const title = sanitizeHtml(document.querySelector('#topic')?.textContent?.trim() as string)
+        const title = document.querySelector('#topic')?.textContent?.trim() as string
         const replycards = document.querySelectorAll('.replygroup')
         
         threadData.title = title
@@ -128,7 +130,6 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             if (idx == 0) {
                 const likes = parseInt(card.querySelector('.btnLikeReply')?.textContent?.trim() as string)
                 const content = card.querySelector('.thread_replycontent')?.innerHTML as string
-                const replierData = card.querySelector('.thread_replierdata')
 
                 threadData.content = content
                 threadData.likes = likes
@@ -139,6 +140,97 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                 const uid = card.querySelector('a[href^="/profile?uid="]')?.getAttribute('href')?.replace('/profile?uid=', '') as string
                 threadData.author.pfp = pfp
                 threadData.author.uid = uid
+                threadData.author.username = card.querySelector('.username')?.textContent?.trim() as string
+                threadData.author.alias = card.querySelector('.usertitle')?.textContent?.trim() || ''
+                threadData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string))
+
+
+                const comments = card.querySelectorAll('.replycard')[1] || null
+                if (comments != null) {
+                    const actualComments = comments.querySelector('.comments')
+                    actualComments?.querySelectorAll('.comment').forEach(comment => {
+                        let commentPfp = comment.querySelector('.commentPfp')?.getAttribute('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+                        if (commentPfp.startsWith('/')) commentPfp = `https://forum.wearedevs.net${commentPfp}`
+
+                        const commentAuthor: ThreadUser = {
+                            username: comment.querySelector('.username')?.textContent?.trim() as string,
+                            uid: comment.querySelector('.username')?.getAttribute('href')?.replace('/profile?uid=', '') as string,
+                            alias: '',
+                            pfp: commentPfp,
+                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string))
+                        }
+
+                        let content = comment.querySelector('.thread_replycontent')?.innerHTML as string
+                        if (!content.startsWith('@')) content = `@${threadData.author.username}\n${content}`
+
+                        threadData.comments.push({
+                            author: commentAuthor,
+                            content,
+                            likes: parseInt(comment.querySelector('.btnLikeReply')?.textContent as string)
+                        })
+                    })
+                }
+            } else {
+                if (card.classList.contains('comment')) return
+                let commentData: Comment = {
+                    content: '',
+                    likes: 0,
+                    author: {
+                        alias: '',
+                        pfp: '',
+                        reputation: 0,
+                        uid: '',
+                        username: ''
+                    },
+                    comments: []
+                }
+
+                const likes = parseInt(card.querySelector('.btnLikeReply')?.textContent?.trim() as string)
+                let content = card.querySelector('.thread_replycontent')?.innerHTML as string
+                
+                commentData.content = content
+                commentData.likes = likes
+
+                let pfp = card.querySelector('.thread_pfp')?.getAttribute('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+
+                if (pfp == undefined) {
+                    console.log(idx);
+                    [].forEach.call(card.children, (c) => {
+                        console.log(c)
+                    })
+                }
+                if (pfp != undefined && pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
+                const uid = card.querySelector('a[href^="/profile?uid="]')?.getAttribute('href')?.replace('/profile?uid=', '') as string
+                commentData.author.pfp = pfp
+                commentData.author.uid = uid
+                commentData.author.username = card.querySelector('.username')?.textContent?.trim() as string
+                commentData.author.alias = card.querySelector('.usertitle')?.textContent?.trim() || ''
+                commentData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string))
+
+                threadData.comments.push(commentData)
+
+                const comments = card.querySelector('.comments') || null
+                if (comments != null) {
+                    const actualComments = comments.querySelector('.commentGroups')
+                    actualComments?.querySelectorAll('.comment').forEach(comment => {
+                        let commentPfp = comment.querySelector('.commentPfp')?.getAttribute('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
+                        if (commentPfp.startsWith('/')) commentPfp = `https://forum.wearedevs.net${commentPfp}`
+
+                        const commentAuthor: ThreadUser = {
+                            username: comment.querySelector('.username')?.textContent?.trim() as string,
+                            uid: comment.querySelector('.username')?.getAttribute('href')?.replace('/profile?uid=', '') as string,
+                            alias: '',
+                            pfp: commentPfp,
+                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string))
+                        }
+
+                        commentData.comments?.push({
+                            author: commentAuthor,
+                            content: `${comment.querySelector('.thread_replycontent')?.innerHTML.startsWith('@') ? '' : `@${commentData.author.username}\n`}${comment.querySelector('.thread_replycontent')?.innerHTML}`,
+                            likes: parseInt(comment.querySelector('.btnLikeReply')?.textContent as string)
+                        })
+                    })
+                }
             }
         })
 

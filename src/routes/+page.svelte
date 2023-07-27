@@ -44,8 +44,10 @@
                             <div class='thread_info'>
                                 <a href="/user/{thread.author.uid}">By {thread.author.username}</a> | 
                                 <span>Replies: {thread.replies}</span> | 
-                                <span>Views: {thread.views}</span> | 
-                                <a href='user/{thread.lastReplier.uid}'>Last replier: {thread.lastReplier.username}</a>
+                                <span>Views: {thread.views}</span>
+                                {#if thread.lastReplier.username != undefined} |
+                                    <a href='user/{thread.lastReplier.uid}'>Last replier: {thread.lastReplier.username}</a>
+                                {/if}
                             </div>
                         </div>
                     {/each}
