@@ -142,7 +142,7 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                 threadData.author.uid = uid
                 threadData.author.username = card.querySelector('.username')?.textContent?.trim() as string
                 threadData.author.alias = card.querySelector('.usertitle')?.textContent?.trim() || ''
-                threadData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string))
+                threadData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string)) || 0
 
 
                 const comments = card.querySelectorAll('.replycard')[1] || null
@@ -157,15 +157,12 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                             uid: comment.querySelector('.username')?.getAttribute('href')?.replace('/profile?uid=', '') as string,
                             alias: '',
                             pfp: commentPfp,
-                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string))
+                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string)) || 0
                         }
-
-                        let content = comment.querySelector('.thread_replycontent')?.innerHTML as string
-                        if (!content.startsWith('@')) content = `@${threadData.author.username}\n${content}`
-
+                        
                         threadData.comments.push({
                             author: commentAuthor,
-                            content,
+                            content: comment.querySelector('.thread_replycontent')?.innerHTML as string,
                             likes: parseInt(comment.querySelector('.btnLikeReply')?.textContent as string)
                         })
                     })
@@ -193,19 +190,13 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
 
                 let pfp = card.querySelector('.thread_pfp')?.getAttribute('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
 
-                if (pfp == undefined) {
-                    console.log(idx);
-                    [].forEach.call(card.children, (c) => {
-                        console.log(c)
-                    })
-                }
                 if (pfp != undefined && pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
                 const uid = card.querySelector('a[href^="/profile?uid="]')?.getAttribute('href')?.replace('/profile?uid=', '') as string
                 commentData.author.pfp = pfp
                 commentData.author.uid = uid
                 commentData.author.username = card.querySelector('.username')?.textContent?.trim() as string
                 commentData.author.alias = card.querySelector('.usertitle')?.textContent?.trim() || ''
-                commentData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string))
+                commentData.author.reputation = parseInt((card.querySelector('.good')?.textContent?.trim() as string) || (card.querySelector('.bad')?.textContent?.trim() as string)) || 0
 
                 threadData.comments.push(commentData)
 
@@ -221,12 +212,12 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
                             uid: comment.querySelector('.username')?.getAttribute('href')?.replace('/profile?uid=', '') as string,
                             alias: '',
                             pfp: commentPfp,
-                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string))
+                            reputation: parseInt((comment.querySelector('.good')?.textContent?.trim() as string) || (comment.querySelector('.bad')?.textContent?.trim() as string)) || 0
                         }
 
                         commentData.comments?.push({
                             author: commentAuthor,
-                            content: `${comment.querySelector('.thread_replycontent')?.innerHTML.startsWith('@') ? '' : `@${commentData.author.username}\n`}${comment.querySelector('.thread_replycontent')?.innerHTML}`,
+                            content: comment.querySelector('.thread_replycontent')?.innerHTML as string,
                             likes: parseInt(comment.querySelector('.btnLikeReply')?.textContent as string)
                         })
                     })
@@ -234,50 +225,6 @@ export const fetchThreadData = async (id: string): Promise<Thread> => {
             }
         })
 
-        // replyGroups.each((index, element) => {
-            // const replyGroup = loaded(element)
-            // const replierData = replyGroup.find('.thread_replierdata')
-            // const replyCard = replyGroup.find('> .replycard:not(:has(> div.comment))')
-// 
-            // if (replyCard.length > 0) {
-                // if (index == 0) {
-                    // const userStats = loaded('.userstats')
-                    // let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
-// 
-                    // if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
-// 
-                    // threadData.author.pfp = pfp
-                    // threadData.author.alias = replierData.find('.userdesc > .usertitle').text().trim() || ''
-                    // threadData.author.username = replierData.find('.username').text().trim()
-                    // threadData.author.uid = replierData.find('a').attr('href')?.replace('/profile?uid=', '') as string
-                    // threadData.content = replyCard.find('> .thread_replycontent').text().trim()
-                    // threadData.title = loaded('#topic').text().trim()
-                    // threadData.likes = parseInt(loaded('.btnLikeReply').html()?.trim() as string)
-                    // threadData.author.reputation = parseInt(userStats.eq(index).find('p:has(span) span').text().trim())
-                // } else {
-                    // const userStats = loaded('.userstats')
-                    // const username = replierData.find('.username').text().trim()
-                    // let pfp = replierData.find('.thread_pfp').attr('style')?.replace('background-image: url(\'', '').replace('\')', '') as string
-// 
-                    // if (pfp.startsWith('/')) pfp = `https://forum.wearedevs.net${pfp}`
-// 
-                    // const parsedComment: Comment = {
-                        // author: {
-                            // uid: replierData.find('a').attr('href')?.trim().replace('/profile?uid=', '') as string,
-                            // username,
-                            // alias: replierData.find('.userdesc > .usertitle').text().trim() || '',
-                            // reputation: parseInt(userStats.find('p:has(span) span').html() as string),
-                            // pfp
-                        // },
-                        // content: replyCard.find('> .thread_replycontent').text().trim()
-                    // }
-// 
-                    // threadData.comments.push(parsedComment)
-                // }
-            // }
-        // })
-        
-        // console.log(threadData)
         return threadData
     } catch (ex) {
         console.log(ex)

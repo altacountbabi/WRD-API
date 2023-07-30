@@ -15,6 +15,7 @@
             scroll-behavior: smooth;
         }
     </style>
+    <title>Latest Threads</title>
 </svelte:head>
 
 <Background/>

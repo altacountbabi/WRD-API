@@ -18,6 +18,7 @@
             scroll-behavior: smooth;
         }
     </style>
+    <title>User</title>
 </svelte:head>
 
 <Background/>

@@ -20,6 +20,7 @@
             scroll-behavior: smooth;
         }
     </style>
+    <title>Thread</title>
 </svelte:head>
 
 <Background/>
@@ -74,6 +75,31 @@
                         <div class="bottom">
                             {@html comment.content}
                         </div>
+                        {#if comment.comments}
+                            <div class="comments">
+                                {#each comment.comments as _comment}
+                                    <div class="comment">
+                                        <div class='top'>
+                                            <div class='pfp'>
+                                                <img src={_comment.author.pfp} alt='profile_picture' width='128' height='128'>
+                                            </div>
+                                            <div class='user_info'>
+                                                <div class='name'>
+                                                    <a href="/user/{_comment.author.uid}" class='username'>{_comment.author.username}</a>
+                                                    {#if _comment.author.alias != ''}
+                                                    <span class='alias'>({_comment.author.alias})</span>
+                                                    {/if}
+                                                </div>
+                                                <span class='reputation'>Reputation: {_comment.author.reputation}</span>
+                                            </div>
+                                        </div>
+                                        <div class="bottom">
+                                            {@html _comment.content}
+                                        </div>
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
                     </div>
                 {/each}
                 {#each [0,1,2,3] as _}
@@ -216,11 +242,27 @@
 
     .bottom :global(a) {
         text-decoration: none;
-        color: #0073d2;
+        color: #0083ee;
+    }
+
+    .comment :global(a) {
+        pointer-events: none;
     }
 
     .bottom :global(p) {
         margin: 0;
+    }
+
+    .comments {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .comment {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
     .CHROME_WEIRD_SHIT_FIX {
