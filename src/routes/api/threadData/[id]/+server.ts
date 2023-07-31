@@ -2,10 +2,10 @@ import { json, type RequestEvent } from "@sveltejs/kit"
 import * as api from "$lib/api.server.js"
 
 export async function GET({ request }: any) {
-	let id: string = request.url.replace(
-		"http://localhost:5173/api/threadData/",
-		""
-	)
+	let id: string = request.url
+		.match(/\/[0-9a-zA-Z]+/g)
+		?.join("")
+		.replace("wrd-api.vercel.app/api/threadData/", "") as string
 	const result = await api.fetchThreadData(id)
 
 	if (result.author.uid == "") {
