@@ -6,6 +6,7 @@ export async function GET({ request }: { request: Request }) {
 		.match(/\/[0-9a-zA-Z]+/g)
 		?.join("")
 		.replace("wrd-api.vercel.app/api/profileData/", "") as string
+	console.log(uid)
 	const result = await api.fetchProfileData(uid)
 
 	if (result.username == "") {
