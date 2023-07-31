@@ -13,5 +13,5 @@
 
 # Known Issues:
 
-1. This will only work on localhost:5173 for now, the folders that cause this issue are: /src/lib/routes/api/profileData and /src/lib/routes/api/threadData
+1. This will only work on https://wrd-api.vercel.app/ for now, the folders that cause this issue are: /src/lib/routes/api/profileData and /src/lib/routes/api/threadData, please edit it if you want it to work on your own domain
 2. UI is not responsive (not planning to fix this)
