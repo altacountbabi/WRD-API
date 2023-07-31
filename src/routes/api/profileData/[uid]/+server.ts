@@ -5,7 +5,7 @@ export async function GET({ request }: { request: Request }) {
 	let uid: string = request.url
 		.match(/\/[0-9a-zA-Z]+/g)
 		?.join("")
-		.replace("wrd-api.vercel.app/api/profileData/", "") as string
+		.replace("/wrd/api/profileData/", "") as string
 	console.log(uid)
 	const result = await api.fetchProfileData(uid)
 
